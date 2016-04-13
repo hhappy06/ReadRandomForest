@@ -2,6 +2,7 @@
 //#include <cl/cl.h>
 //#include <ppl.h>
 #include <iostream>
+#include "fstream"
 #include "zlib/zlib.h"
 //#include "../resource.h"
 #include "Util.h"
@@ -259,21 +260,21 @@ bool BodyPartClassifier::BuildForestFromResource( )
 	// decrypt & uncompress
 	const unsigned char * pSource = (const unsigned char *) lpResLock;
 #else
-    qInitResources_resource_qt();
-	QFile file(":/model/res/XXX.z");							//@xu-li:QFile是QT的类，由文件地址创建文件类
-	if (!file.open(QIODevice::ReadOnly))
-	{
-		std::cout <<"resource open error!" <<std::endl;
-		assert(0);
-	};
-	bool exist = file.exists();
-	assert(exist);
-	QDataStream in(&file);										//@xu-li:创建一个QDataStream类，QDataStream是QT的类，对二进制提供串行数据输入输出流
-	//int QDataStream::readRawData(char * s, int len)
+	char* pfile = ":/model/res/XXX.z";
+	istream ifile(pfile, ios::binary);
+	ifile.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
+	
+										//@xu-li:创建一个QDataStream类，QDataStream是QT的类，对二进制提供串行数据输入输出流
+	//get file length
+	istream::pos_type current_pos = ifile.tellg();
+	ifile.seekg(0, ios_base::end);
+	const int cbSize = ifile.tellg();
+	ifile.seekg(current_pos);
+
 	char * s = new  char [32*1024*1024];
 	const  unsigned char * pSource  = (const unsigned char *)s;
 	assert(s != 0);
-	const int cbSize = in.readRawData(s, 32*1024*1024);
+	ifile.read(s, 32 * 1024 * 1024);
 	assert (cbSize > 0);
 #endif
 	unsigned char * pDest = new unsigned char [32*1024*1024];
@@ -546,7 +547,7 @@ NUI_SKELETON_POSITION_TRACKING_STATE MAX_Stage(NUI_BODY_PART_POSITION_TRACKING_S
 {
 	int i1 = (int)(s1);
 	int i2 = (int)(s2);
-	int res = std::max<int>(i1, i2);
+	int res = max(i1, i2);
 
 	return (NUI_SKELETON_POSITION_TRACKING_STATE)res;
 }
@@ -556,7 +557,7 @@ NUI_SKELETON_POSITION_TRACKING_STATE MIN_Stage(NUI_BODY_PART_POSITION_TRACKING_S
 {
 	int i1 = (int)(s1);
 	int i2 = (int)(s2);
-	int res = std::min<int>(i1, i2);
+	int res = min(i1, i2);
 
 	return (NUI_SKELETON_POSITION_TRACKING_STATE)res;
 }
