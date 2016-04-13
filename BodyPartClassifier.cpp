@@ -232,7 +232,6 @@ int inf(const unsigned char * pSrc, int srcSize, unsigned char * pDst, int dstSi
 	return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
 }
 
-extern int qInitResources_resource_qt();
 bool BodyPartClassifier::BuildForestFromResource( )
 {
 	bool res = FALSE;
