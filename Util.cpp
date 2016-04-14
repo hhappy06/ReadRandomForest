@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "Util.h"
 #ifdef WIN32
 #include <windows.h>

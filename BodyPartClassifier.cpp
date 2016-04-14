@@ -900,8 +900,8 @@ void BodyPartClassifier::ModelFittingStage_RunFrame(const NUI_CENTROIDS_STAGE_DA
 			//GET_SKELETON_4(NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_SPINE, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_HIP_RIGHT);
 
 			pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_HIP_CENTER] = (pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_SPINE] + (pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_HIP_LEFT]*2.0f + pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_HIP_RIGHT]*2.0f)) * 0.2f;
-			int tmp1 = std::min<int>((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_LEFT], (int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_RIGHT]);
-			int tmp2 = std::min<int>((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_SPINE], tmp1);
+			int tmp1 = min((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_LEFT], (int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_RIGHT]);
+			int tmp2 = min((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_SPINE], tmp1);
 			pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_CENTER] = (NUI_SKELETON_POSITION_TRACKING_STATE)tmp2;
 
 			/*GET_SKELETON_2(NUI_SKELETON_POSITION_SPINE, BODY_PART_LW_TORSO, BODY_PART_RW_TORSO);
@@ -1234,8 +1234,8 @@ void BodyPartClassifier::ModelFittingStage_RunFrame(const NUI_CENTROIDS_STAGE_DA
 			//GET_SKELETON_4(NUI_SKELETON_POSITION_HIP_CENTER, NUI_SKELETON_POSITION_SPINE, NUI_SKELETON_POSITION_HIP_LEFT, NUI_SKELETON_POSITION_HIP_RIGHT);
 
 			pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_HIP_CENTER] = (pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_SPINE] + (pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_HIP_LEFT]*2.0f + pSkeleton->SkeletonPositions[NUI_SKELETON_POSITION_HIP_RIGHT]*2.0f)) * 0.2f;
-			int tmp1 = std::min<int>((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_LEFT], (int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_RIGHT]);
-			int tmp2 = std::min<int>((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_SPINE], tmp1);
+			int tmp1 = min((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_LEFT], (int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_RIGHT]);
+			int tmp2 = min((int)pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_SPINE], tmp1);
 			pSkeleton->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_CENTER] = (NUI_SKELETON_POSITION_TRACKING_STATE)tmp2;
 
 			// 以下均尚未确定
@@ -1244,8 +1244,8 @@ void BodyPartClassifier::ModelFittingStage_RunFrame(const NUI_CENTROIDS_STAGE_DA
 
 			GET_SKELETON_5_sf(NUI_SKELETON_POSITION_SPINE, BODY_PART_LU_TORSO, BODY_PART_RU_TORSO, BODY_PART_LW_TORSO, BODY_PART_RW_TORSO);
 			pSkeleton_sf->SkeletonPositions[NUI_SKELETON_POSITION_HIP_CENTER] = (pSkeleton_sf->SkeletonPositions[NUI_SKELETON_POSITION_SPINE] + (pSkeleton_sf->SkeletonPositions[NUI_SKELETON_POSITION_HIP_LEFT]*2.0f + pSkeleton_sf->SkeletonPositions[NUI_SKELETON_POSITION_HIP_RIGHT]*2.0f)) * 0.2f;
-			int tmp1_sf = std::min<int>((int)pSkeleton_sf->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_LEFT], (int)pSkeleton_sf->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_RIGHT]);
-			int tmp2_sf = std::min<int>((int)pSkeleton_sf->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_SPINE], tmp1);
+			int tmp1_sf = min((int)pSkeleton_sf->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_LEFT], (int)pSkeleton_sf->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_RIGHT]);
+			int tmp2_sf = min((int)pSkeleton_sf->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_SPINE], tmp1);
 			pSkeleton_sf->eSkeletonPositionTrackingState[NUI_SKELETON_POSITION_HIP_CENTER] = (NUI_SKELETON_POSITION_TRACKING_STATE)tmp2;
 
 
