@@ -179,23 +179,16 @@ bool BodyPartClassifier::BuildForestFromResource( )
 {
 	bool res = FALSE;
 
-	char* pfile = ":/model/res/XXX.z";
-	ifstream ifile(pfile, ios::binary);
-	ifile.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
-	
-										//@xu-li:创建一个QDataStream类，QDataStream是QT的类，对二进制提供串行数据输入输出流
-	//get file length
-	istream::pos_type current_pos = ifile.tellg();
-	ifile.seekg(0, ios_base::end);
-	const int cbSize = ifile.tellg();
-	ifile.seekg(current_pos);
-
-	printf("the random forest length is %d\n", cbSize);
+	char* pfile = "XXX.z";
+	ifstream ifile(pfile, ios::binary|ios::in);
+	//ifile.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
 
 	char * s = new  char [32*1024*1024];
 	const  unsigned char * pSource  = (const unsigned char *)s;
 	assert(s != 0);
 	ifile.read(s, 32 * 1024 * 1024);
+	const int cbSize = ifile.gcount();
+	printf("the random forest length is %d\n", cbSize);
 	assert (cbSize > 0);
 
 	unsigned char * pDest = new unsigned char [32*1024*1024];
