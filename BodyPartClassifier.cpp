@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <float.h>
+#include "stdio.h"
 
 #include <cassert>
 #define NUI_IMAGE_PLAYER_INDEX_SHIFT          3
@@ -179,7 +180,7 @@ bool BodyPartClassifier::BuildForestFromResource( )
 	bool res = FALSE;
 
 	char* pfile = ":/model/res/XXX.z";
-	istream ifile(pfile, ios::binary);
+	ifstream ifile(pfile, ios::binary);
 	ifile.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
 	
 										//@xu-li:创建一个QDataStream类，QDataStream是QT的类，对二进制提供串行数据输入输出流
@@ -188,6 +189,8 @@ bool BodyPartClassifier::BuildForestFromResource( )
 	ifile.seekg(0, ios_base::end);
 	const int cbSize = ifile.tellg();
 	ifile.seekg(current_pos);
+
+	printf("the random forest length is %d\n", cbSize);
 
 	char * s = new  char [32*1024*1024];
 	const  unsigned char * pSource  = (const unsigned char *)s;

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "NuiSinect.h"
 
 void NuiSinectImageResolutionToSize( _In_ NUI_IMAGE_RESOLUTION res, _Out_ int & refWidth, _Out_ int & refHeight )

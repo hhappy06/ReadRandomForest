@@ -39,6 +39,39 @@
     <ClInclude Include="Util.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="zlib\crc32.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\deflate.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\gzguts.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inffast.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inffixed.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inflate.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inftrees.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\trees.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\zconf.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\zlib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\zutil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +93,30 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\adler32.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\crc32.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\deflate.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\inffast.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\inflate.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\inftrees.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\trees.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\zutil.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
