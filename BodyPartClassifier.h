@@ -95,6 +95,16 @@ public:
 	Vector4 btmp1[ 20*6 ];
 	Vector4 btmp2[ 20*6 ];
 	unsigned char isfirstTime[ 20*6 ];
+
+	bool WriteForest(char* pwirtefilename)
+	{
+		return m_forest.WriteForest(pwirtefilename);
+	}
+
+	bool BuildRandomForestFromUnzipfile(char* pfilename);
+	{
+		return m_forest.BuildRandomForestFromUnzipfile(pfilename);
+	}
 };
 
 #endif//

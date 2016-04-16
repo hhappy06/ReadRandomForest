@@ -1,6 +1,8 @@
 #ifndef _RANDOMFOREST_
 #define _RANDOMFOREST_
+#include "fstream"
 
+using namespace std;
 
 
 
@@ -54,6 +56,15 @@ public:
 	//cl_mem m_cl_value;
 	//cl_context  m_context;
 	//cl_command_queue m_commandQueue;
+
+	int m_TreeNumber;
+	int m_TreeDepth;
+	int m_NodeNumber;
+	int m_ValueNumber;
+	TreeNode** m_ppTree2;
+	NodeValue* m_pValue2;
+	bool WriteForest(char* pwirtefilename);
+	bool BuildRandomForestFromUnzipfile(char* pfilename);
 };
 
 

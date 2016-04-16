@@ -20,6 +20,20 @@ RandomForest::RandomForest()
 
 RandomForest::~RandomForest()
 {
+	//if (m_ppTree)
+	//{
+	//	for (int i = 0; i < TREE_COUNT; i ++)
+	//	{
+	//		if (m_ppTree[i])
+	//		{
+	//			delete [] m_ppTree[i];
+	//			m_ppTree[i] = NULL;
+	//		}
+	//	}
+	//	delete [] m_ppTree;
+	//	// m_ppTree = NULL;
+	//}
+
 	delete [] m_ppTree[0];
 	if (m_pValue)
 	{
@@ -127,7 +141,6 @@ bool RandomForest::BuildForest(const  char * pszData, const int size)
 	return TRUE;
 }
 
-
 const TreeNode * RandomForest::Tree(int treeID) const
 {
 	if (treeID < 0 || treeID >= TREE_COUNT)
@@ -167,6 +180,81 @@ const NodeValue * RandomForest::Value(int valueID) const
 	}
 }
 
+bool RandomForest::WriteForest(char* pwirtefilename)
+{
+	ASSERT(pwirtefilename != '\0', );
 
+	ofstream ofileout;
+	ofileout.open(pwirtefilename, ios::binary | ios::out);
+	
+	ASSERT(ofileout.is_open() != false);
 
+	printf("writing random forest structure...");
+	ofileout.write((char*)(&TREE_COUNT),sizeof(TREE_COUNT));
+	ofileout.write((char*)(&TREE_DEPTH), sizeof(TREE_DEPTH));
 
+	const TreeNode* pnode;
+	int idxnode;
+	for (int idxtree = 0; idxtree < TREE_COUNT; idxtree++)
+	{
+		for (idxnode = 0; idxnode < NODE_COUNT; idxnode++)
+		{
+			pnode = this->Node(idxtree, idxnode);
+			ASSERT(pnode != NULL);
+			ofileout.write((char*)(pnode),sizeof(TreeNode));
+		}
+
+		ASSERT(idxnode == NODE_COUNT);
+	}
+
+	printf(" done!\n");
+
+	printf("writing random forest node value...");
+	ofileout.write((char*)(&VALUE_COUNT),sizeof(VALUE_COUNT));
+	
+	tmpNodeValueStorage nodevalue;
+	for (idxnode = 0; idxnode < VALUE_COUNT; idxnode++)
+	{
+		nodevalue.ind = m_pValue[idxnode].v[0].id;
+		nodevalue.v[0] = m_pValue[idxnode].v[0].cnt;
+
+		nodevalue.ind <<= 5;
+		nodevalue.ind += m_pValue[idxnode].v[1].id;
+		nodevalue.v[1] = m_pValue[idxnode].v[1].cnt;
+
+		nodevalue.ind <<= 5;
+		nodevalue.ind += m_pValue[idxnode].v[2].id;
+		nodevalue.v[2] = m_pValue[idxnode].v[2].cnt;
+
+		nodevalue.ind <<= 5;
+		nodevalue.ind += m_pValue[idxnode].v[3].id;
+		nodevalue.v[3] = m_pValue[idxnode].v[3].cnt;
+
+		nodevalue.ind <<= 5;
+		nodevalue.ind += m_pValue[idxnode].v[4].id;
+		nodevalue.v[4] = m_pValue[idxnode].v[4].cnt;
+
+		nodevalue.ind <<= 5;
+		nodevalue.ind += m_pValue[idxnode].v[5].id;
+		nodevalue.v[5] = m_pValue[idxnode].v[5].cnt;
+
+		ofileout.write((char*)(&nodevalue),sizeof(nodevalue));
+	}
+
+	ofileout.close();
+
+	printf("done!\n");
+
+	return true;
+}
+
+bool RandomForest::BuildRandomForestFromUnzipfile(char* pfilename)
+{
+	ASSERT(pfilename != '\0');
+	if (pfilename == NULL || pfilename == '\0')
+		return false;
+
+	ifstream ifile;
+	ifile.open(pfilename, ios::binary | ios::in);
+	return true;
+}
