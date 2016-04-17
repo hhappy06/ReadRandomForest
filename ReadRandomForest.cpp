@@ -12,5 +12,7 @@ int main()
 
 	char* poutfile = "rf.bin";
 	mbd.WriteForest(poutfile);
+	mbd.BuildRandomForestFromUnzipfile(poutfile);
+	mbd.cmpRandomForest();
 	char ch = getchar();
 }

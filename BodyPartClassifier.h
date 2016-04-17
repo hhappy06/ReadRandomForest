@@ -101,9 +101,14 @@ public:
 		return m_forest.WriteForest(pwirtefilename);
 	}
 
-	bool BuildRandomForestFromUnzipfile(char* pfilename);
+	bool BuildRandomForestFromUnzipfile(char* pfilename)
 	{
 		return m_forest.BuildRandomForestFromUnzipfile(pfilename);
+	}
+
+	bool cmpRandomForest(void)
+	{
+		return m_forest.cmpRandomForest();
 	}
 };
 

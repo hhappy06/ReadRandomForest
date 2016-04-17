@@ -215,28 +215,25 @@ bool RandomForest::WriteForest(char* pwirtefilename)
 	tmpNodeValueStorage nodevalue;
 	for (idxnode = 0; idxnode < VALUE_COUNT; idxnode++)
 	{
-		nodevalue.ind = m_pValue[idxnode].v[0].id;
+		
 		nodevalue.v[0] = m_pValue[idxnode].v[0].cnt;
-
-		nodevalue.ind <<= 5;
-		nodevalue.ind += m_pValue[idxnode].v[1].id;
 		nodevalue.v[1] = m_pValue[idxnode].v[1].cnt;
+		nodevalue.v[2] = m_pValue[idxnode].v[2].cnt;
+		nodevalue.v[3] = m_pValue[idxnode].v[3].cnt;
+		nodevalue.v[4] = m_pValue[idxnode].v[4].cnt;
+
+		nodevalue.ind = m_pValue[idxnode].v[4].id;
+		nodevalue.ind <<= 5;
+		nodevalue.ind += m_pValue[idxnode].v[3].id;
 
 		nodevalue.ind <<= 5;
 		nodevalue.ind += m_pValue[idxnode].v[2].id;
-		nodevalue.v[2] = m_pValue[idxnode].v[2].cnt;
-
+		
 		nodevalue.ind <<= 5;
-		nodevalue.ind += m_pValue[idxnode].v[3].id;
-		nodevalue.v[3] = m_pValue[idxnode].v[3].cnt;
-
+		nodevalue.ind += m_pValue[idxnode].v[1].id;
+		
 		nodevalue.ind <<= 5;
-		nodevalue.ind += m_pValue[idxnode].v[4].id;
-		nodevalue.v[4] = m_pValue[idxnode].v[4].cnt;
-
-		nodevalue.ind <<= 5;
-		nodevalue.ind += m_pValue[idxnode].v[5].id;
-		nodevalue.v[5] = m_pValue[idxnode].v[5].cnt;
+		nodevalue.ind += m_pValue[idxnode].v[0].id;
 
 		ofileout.write((char*)(&nodevalue),sizeof(nodevalue));
 	}
@@ -320,10 +317,6 @@ bool RandomForest::BuildRandomForestFromUnzipfile(char* pfilename)
 		tmpvalue.ind >>= 5;
 		m_pValue2[ivalue].v[4].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
 		m_pValue2[ivalue].v[4].cnt = tmpvalue.v[4];
-
-		tmpvalue.ind >>= 5;
-		m_pValue2[ivalue].v[5].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
-		m_pValue2[ivalue].v[5].cnt = tmpvalue.v[5];
 	}
 
 	if (ifile.is_open())
@@ -342,8 +335,63 @@ bool RandomForest::cmpRandomForest(void)
 
 	printf("comparing structure:");
 	
-	if(m_TreeNumber != )
+	if (m_TreeNumber != TREE_COUNT)
+	{
+		printf("tree number is not same!\n");
+		return false;
+	}
 
+	if (m_NodeNumber != NODE_COUNT)
+	{
+		printf("node number is not same!\n");
+		return false;
+	}
+
+	if (m_TreeDepth != TREE_DEPTH)
+	{
+		printf("tree depth is not same!\n");
+		return false;
+	}
+
+	if (m_ValueNumber != VALUE_COUNT)
+	{
+		printf("value number is not same!\n");
+		return false;
+	}
+
+	// match structure of random forest
+	for (int itree = 0; itree < m_TreeNumber; itree++)
+	{
+		TreeNode* p1 = m_ppTree[itree];
+		TreeNode* p2 = m_ppTree2[itree];
+
+		for (int inode = 0; inode < m_NodeNumber; inode++)
+		{
+			if (p1[inode].c != p2[inode].c
+				|| p1[inode].left != p2[inode].left
+				|| p1[inode].right != p2[inode].right
+				|| p1[inode].ux != p2[inode].ux
+				|| p1[inode].uy != p2[inode].uy
+				|| p1[inode].vx != p2[inode].vx
+				|| p1[inode].vy != p2[inode].vy)
+			{
+				printf("tree node is not same\n");
+				return false;
+			}
+		}
+	}
+
+	printf("structure of random forest is same\n");
+	printf("Compare node value of random forest\n");
+
+	for (int ivalue = 0; ivalue < m_ValueNumber; ivalue++)
+	{
+		if (m_pValue[ivalue] != m_pValue2[ivalue])
+		{
+			printf("node value is not same%d\n",ivalue);
+			return false;
+		}
+	}
 	printf("same\n");
-
+	return true;
 }

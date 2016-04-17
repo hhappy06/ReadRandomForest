@@ -1,6 +1,7 @@
 #ifndef _RANDOMFOREST_
 #define _RANDOMFOREST_
 #include "fstream"
+#include "iostream"
 
 using namespace std;
 
@@ -29,6 +30,21 @@ struct ClassDist
 struct NodeValue
 {
     ClassDist v[5];
+	bool operator != (const NodeValue &p1) const
+	{
+		for (int idx = 0; idx < 5; idx++)
+		{
+			if (this->v[idx].cnt != p1.v[idx].cnt || this->v[idx].id != p1.v[idx].id)
+			{
+				cout << (int) this->v[idx].cnt << ' ' << (int) p1.v[idx].cnt << ' '
+					<< (int) this->v[idx].id << ' ' << (int) p1.v[idx].id << endl;
+				cout << "...." << idx << "..." << endl;
+				return true;
+			}
+		}
+		return false;
+	}
+
 };
 
 
@@ -69,8 +85,6 @@ public:
 	
 	bool cmpRandomForest(void);
 };
-
-
 
 
 #endif// _RANDOMFOREST_
