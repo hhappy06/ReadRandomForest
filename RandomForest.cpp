@@ -256,5 +256,94 @@ bool RandomForest::BuildRandomForestFromUnzipfile(char* pfilename)
 
 	ifstream ifile;
 	ifile.open(pfilename, ios::binary | ios::in);
+	if (!ifile.is_open())
+		printf("cannot open the file:%s\n", pfilename);
+	ASSERT(ifile.is_open());
+
+	ifile.read((char*)(&m_TreeNumber), sizeof(m_TreeNumber));
+	ifile.read((char*)(&m_TreeDepth),sizeof(m_TreeDepth));
+	
+	ASSERT(m_TreeNumber > 0);
+	ASSERT(m_TreeDepth > 0);
+
+	m_NodeNumber = (2 << (m_TreeDepth)) - 1;
+
+	m_ppTree2 = new TreeNode*[m_TreeNumber];
+	m_ppTree2[0] = new TreeNode[m_NodeNumber*m_TreeNumber];
+
+	for (int itree = 1; itree < m_TreeNumber; itree++)
+	{
+		m_ppTree2[itree] = m_ppTree2[0] + m_NodeNumber * itree;
+	}
+	
+
+	int idxnode;
+	TreeNode* temptree;
+	for (int itree = 0; itree < m_TreeNumber; itree++)
+	{
+		temptree = m_ppTree2[itree];
+		for (idxnode = 0; idxnode < m_NodeNumber; idxnode++)
+		{
+			ifile.read((char*)temptree, sizeof(*temptree));
+			temptree++;
+		}
+	}
+	printf("my random forest structure is built\n");
+
+	ifile.read((char*)(&m_ValueNumber),sizeof(m_ValueNumber));
+	
+	ASSERT(m_ValueNumber > 0);
+
+	m_pValue2 = new NodeValue[m_ValueNumber];
+	ASSERT(m_pValue2 != NULL);
+
+	tmpNodeValueStorage tmpvalue;
+	for (int ivalue = 0; ivalue < m_ValueNumber; ivalue++)
+	{
+		ifile.read((char*)(&tmpvalue), sizeof(tmpvalue));
+
+		m_pValue2[ivalue].v[0].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
+		m_pValue2[ivalue].v[0].cnt = tmpvalue.v[0];
+
+		tmpvalue.ind >>= 5;
+		m_pValue2[ivalue].v[1].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
+		m_pValue2[ivalue].v[1].cnt = tmpvalue.v[1];
+
+		tmpvalue.ind >>= 5;
+		m_pValue2[ivalue].v[2].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
+		m_pValue2[ivalue].v[2].cnt = tmpvalue.v[2];
+
+		tmpvalue.ind >>= 5;
+		m_pValue2[ivalue].v[3].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
+		m_pValue2[ivalue].v[3].cnt = tmpvalue.v[3];
+
+		tmpvalue.ind >>= 5;
+		m_pValue2[ivalue].v[4].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
+		m_pValue2[ivalue].v[4].cnt = tmpvalue.v[4];
+
+		tmpvalue.ind >>= 5;
+		m_pValue2[ivalue].v[5].id = (unsigned char)(tmpvalue.ind & 0x0000001F);
+		m_pValue2[ivalue].v[5].cnt = tmpvalue.v[5];
+	}
+
+	if (ifile.is_open())
+		ifile.close();
+
+	printf("my random forest reading is done!\n");
+
 	return true;
+}
+
+bool RandomForest::cmpRandomForest(void)
+{
+	ASSERT(m_ppTree != NULL && m_ppTree2 != NULL);
+	if (m_ppTree == NULL && m_ppTree2 == NULL)
+		return false;
+
+	printf("comparing structure:");
+	
+	if(m_TreeNumber != )
+
+	printf("same\n");
+
 }

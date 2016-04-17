@@ -57,14 +57,17 @@ public:
 	//cl_context  m_context;
 	//cl_command_queue m_commandQueue;
 
-	int m_TreeNumber;
-	int m_TreeDepth;
-	int m_NodeNumber;
-	int m_ValueNumber;
+	unsigned int m_TreeNumber;
+	unsigned int m_TreeDepth;
+	unsigned int m_NodeNumber;
+	unsigned int m_ValueNumber;
 	TreeNode** m_ppTree2;
 	NodeValue* m_pValue2;
+
 	bool WriteForest(char* pwirtefilename);
 	bool BuildRandomForestFromUnzipfile(char* pfilename);
+	
+	bool cmpRandomForest(void);
 };
 
 
