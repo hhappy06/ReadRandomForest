@@ -395,3 +395,29 @@ bool RandomForest::cmpRandomForest(void)
 	printf("same\n");
 	return true;
 }
+
+const TreeNode  * RandomForest::GetTree(int treeID) const
+{	
+	if (treeID < 0 || treeID >= m_TreeNumber)
+	{
+		return NULL;
+	}
+	return m_ppTree2[treeID];
+}
+const TreeNode  * RandomForest::GetNode(int treeID, int nodeID) const
+{
+	if(treeID < 0 || treeID >= m_TreeNumber
+		|| nodeID < 0 || nodeID >= m_NodeNumber)
+	{
+		return NULL;
+	}
+
+	return m_ppTree2[treeID] + nodeID;
+}
+const NodeValue * RandomForest::GetValue(int valueID) const
+{
+	if (valueID < 0 || valueID >= m_ValueNumber)
+		return NULL;
+	
+	return m_pValue2 + valueID;
+}

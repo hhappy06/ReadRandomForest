@@ -82,8 +82,11 @@ public:
 
 	bool WriteForest(char* pwirtefilename);
 	bool BuildRandomForestFromUnzipfile(char* pfilename);
-	
 	bool cmpRandomForest(void);
+
+	const TreeNode  * GetTree(int treeID) const;
+	const TreeNode  * GetNode(int treeID, int nodeID) const;
+	const NodeValue * GetValue(int valueID) const;
 };
 
 

@@ -205,4 +205,39 @@ bool BodyPartClassifier::BuildForestFromResource( )
 	return res;
 }
 
+bool BodyPartClassifier::LoadImage(const cv::Mat in_depthmat, const cv::Mat in_maskmat)
+{
+	if (!m_DepthMat.empty())
+	{
+		m_DepthMat.release();
+		m_MaskMat.release();
+	}
+	if (in_depthmat.empty() || in_maskmat.empty())
+	{
+		return NULL;
+	}
+
+	in_depthmat.copyTo(m_DepthMat);
+	in_maskmat.copyTo(m_MaskMat);
+
+	if (m_PriorMat[0][0].empty()
+		|| m_PriorMat[0][0].size != in_depthmat.size)
+	{
+		for (int ip = 0; ip < _SUPPROT_PERSON_NUMBER_; ip++)
+		{
+			for (int im = 0; im < _BODY_PART_NUMBER_; im++)
+			{
+				m_PriorMat[ip][im] = cv::Mat(in_depthmat.cols,in_depthmat.rows,CV_32FC1);
+			}
+		}
+	}
+
+	for (int ip = 0; ip < _SUPPROT_PERSON_NUMBER_; ip++)
+	{
+		for (int im = 0; im < _BODY_PART_NUMBER_; im++)
+		{
+			m_PriorMat[ip][im].setTo(0);
+		}
+	}
+}
 

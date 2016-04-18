@@ -4,7 +4,11 @@
 #include "NuiSinect.h"
 #include "RandomForest.h"
 #include "Filter.h"
-//using namespace NuiSinect;
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+using namespace cv;
+
 //#define _Vector4I_
 #ifndef _Vector4I_
 #define _Vector4I_
@@ -54,6 +58,13 @@ struct _Joints_Smoothing_State
 #endif// _Joints_Smoothing_State_
 //////////////////////////////////////////////////////////////////////////
 
+#ifndef _SUPPROT_PERSON_NUMBER_
+#define _SUPPROT_PERSON_NUMBER_ 6
+#endif // !_SUPPROT_PERSON_NUMBER_
+
+#ifndef _BODY_PART_NUMBER_
+#define _BODY_PART_NUMBER_ 31
+#endif // !_BODY_PART_NUMBER_
 
 
 class  BodyPartClassifier
@@ -110,6 +121,13 @@ public:
 	{
 		return m_forest.cmpRandomForest();
 	}
+
+	cv::Mat m_DepthMat;
+	cv::Mat m_MaskMat;
+
+	cv::Mat m_PriorMat[_SUPPROT_PERSON_NUMBER_][_BODY_PART_NUMBER_];
+
+	bool LoadImage(const cv::Mat in_depthmat, const cv::Mat in_maskmat);
 };
 
 #endif//
