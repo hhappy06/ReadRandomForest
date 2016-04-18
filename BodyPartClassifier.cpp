@@ -240,4 +240,8 @@ bool BodyPartClassifier::LoadImage(const cv::Mat in_depthmat, const cv::Mat in_m
 		}
 	}
 }
+bool BodyPartClassifier::PredictRawParallel(void)
+{
+	if(m_DepthMat.empty() || m_DepthMat.)
+}
 

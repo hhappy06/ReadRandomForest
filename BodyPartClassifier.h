@@ -128,6 +128,7 @@ public:
 	cv::Mat m_PriorMat[_SUPPROT_PERSON_NUMBER_][_BODY_PART_NUMBER_];
 
 	bool LoadImage(const cv::Mat in_depthmat, const cv::Mat in_maskmat);
+	bool PredictRawParallel(void);
 };
 
 #endif//
