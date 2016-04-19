@@ -30,6 +30,8 @@
 #define PARALLEL_FOR_BEGIN(V, S, E) for (int V = S; V < E; y ++)
 #define PARALLEL_FOR_END            }
 #endif
+
+
 #include <limits.h>
 
 #define FILEOUTPUT(x)
@@ -216,6 +218,9 @@ bool BodyPartClassifier::LoadImage(const cv::Mat in_depthmat, const cv::Mat in_m
 	{
 		return NULL;
 	}
+	m_CurrentPersonNumber = 0;
+	m_ScaleHeight = 0.0f;
+	m_ScaleWidth = 0.0f;
 
 	in_depthmat.copyTo(m_DepthMat);
 	in_maskmat.copyTo(m_MaskMat);
@@ -227,10 +232,16 @@ bool BodyPartClassifier::LoadImage(const cv::Mat in_depthmat, const cv::Mat in_m
 		{
 			for (int im = 0; im < _BODY_PART_NUMBER_; im++)
 			{
-				m_PriorMat[ip][im] = cv::Mat(in_depthmat.cols,in_depthmat.rows,CV_32FC1);
+				m_PriorMat[ip][im] = cv::Mat(INFER_IMAGE_WIDTH,INFER_IMAGE_HEIGHT,CV_32SC1);
 			}
 		}
 	}
+
+}
+bool BodyPartClassifier::PredictRawParallel(void)
+{
+	if (m_DepthMat.empty())
+		return false;
 
 	for (int ip = 0; ip < _SUPPROT_PERSON_NUMBER_; ip++)
 	{
@@ -239,9 +250,96 @@ bool BodyPartClassifier::LoadImage(const cv::Mat in_depthmat, const cv::Mat in_m
 			m_PriorMat[ip][im].setTo(0);
 		}
 	}
-}
-bool BodyPartClassifier::PredictRawParallel(void)
-{
-	if(m_DepthMat.empty() || m_DepthMat.)
+
+	m_ScaleWidth = float (m_DepthMat.cols) / (float) INFER_IMAGE_WIDTH;
+	m_ScaleHeight = float(m_DepthMat.rows) / (float) INFER_IMAGE_HEIGHT;
+
+	for (int y = 0; y < INFER_IMAGE_HEIGHT; y++)
+	{
+		for (int x = 0; x < INFER_IMAGE_WIDTH; x++)
+		{
+			PredictOnePixel(x, y);
+		}
+	}
 }
 
+bool BodyPartClassifier::PredictOnePixel(int in_x, int in_y)
+{
+	if (in_x < 0 || in_x >= INFER_IMAGE_WIDTH
+		|| in_y < 0 || in_y >= INFER_IMAGE_HEIGHT)
+		return;
+
+	int orix = (int)(m_ScaleWidth * in_x);
+	int oriy = (int)(m_ScaleHeight * in_y);
+
+	int pid = (int) m_MaskMat.ptr<uchar>(oriy)[orix];
+	if ( pid == 0)
+		return;
+
+	int depthv = m_DepthMat.ptr<unsigned short>(oriy)[orix];
+	float fscalex = m_ScaleWidth * NORMALIZED_DEPTH_VALUE_ / (float)depthv;
+	float fscaley = m_ScaleHeight * NORMALIZED_DEPTH_VALUE_ / (float)depthv;
+
+	uchar ux, uy, vx, vy;
+	int node_id, p1x, p1y, p2x, p2y;
+	int depthv1, depthv2;
+	for (int itree = 0; itree < m_forest.TreeNumber(); itree++)
+	{
+		node_id = 0;
+		while (node_id >= 0)
+		{
+			const TreeNode* pnode = m_forest.GetNode(itree, node_id);
+
+			ux = pnode->ux;
+			uy = pnode->uy;
+			vx = pnode->vx;
+			vy = pnode->vy;
+
+			// calculate shift point
+			// calc p1, p2
+			p1x = (int)(((float)ux * fscalex) + (orix));//@xu-li:第一个偏移后像素点的x,x*2是图像缩小的缘故
+			p1y = (int)(((float)uy * fscaley) + (oriy));//@xu-li:第一个偏移后像素点的y
+			p2x = (int)(((float)vx * fscalex) + (orix));//@xu-li:第二个偏移后像素点的x
+			p2y = (int)(((float)vy * fscaley) + (oriy));//@xu-li:第二个偏移后像素点的y
+
+			depthv1 = DEPTH_UNUSUAL_VALUE;
+			if (p1x >= 0 && p1x < m_DepthMat.cols && p1y >= 0 && p1y < m_DepthMat.rows)
+			{
+				if (m_MaskMat.ptr<uchar>(p1y)[p1x] == pid)
+					depthv1 = m_DepthMat.ptr<ushort>(p1y)[p1x];
+			}
+
+			if (vx == 0 && vy == 0)
+			{
+				depthv2 = depthv;
+			}
+			else
+			{
+				depthv2 = DEPTH_UNUSUAL_VALUE;
+				if (p2x >= 0 && p2x < m_DepthMat.cols && p2y >= 0 && p2y < m_DepthMat.rows)
+				{
+					if (m_MaskMat.ptr<uchar>(p2y)[p2x] == pid)
+						depthv2 = m_DepthMat.ptr<ushort>(p2y)[p2x];
+				}
+			}
+
+			if (depthv1 - depthv2 < (int)pnode->c)
+				node_id = pnode->left;
+			else
+			{
+				node_id = pnode->right;
+			}
+		}
+
+		// get leaf node 
+		int value_id = -(node_id + 1);
+		const NodeValue* valuedst = m_forest.GetValue(value_id);
+		assert(valuedst->v[0].cnt + valuedst->v[1].cnt + valuedst->v[2].cnt + valuedst->v[3].cnt + valuedst->v[4].cnt <= 255);
+		for (int i = 0; i < 5; i++)
+		{
+			uchar part_id = valuedst->v[i].id;
+			uchar part_cnt = valuedst->v[i].cnt;
+			m_PriorMat[pid][part_id].ptr<int>(in_y)[in_x] += part_cnt;
+		}
+	}
+}

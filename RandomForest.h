@@ -87,6 +87,8 @@ public:
 	const TreeNode  * GetTree(int treeID) const;
 	const TreeNode  * GetNode(int treeID, int nodeID) const;
 	const NodeValue * GetValue(int valueID) const;
+
+	int TreeNumber(void) { return m_TreeNumber; }
 };
 
 

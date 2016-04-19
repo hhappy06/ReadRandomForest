@@ -66,7 +66,10 @@ struct _Joints_Smoothing_State
 #define _BODY_PART_NUMBER_ 31
 #endif // !_BODY_PART_NUMBER_
 
-
+#define INFER_IMAGE_HEIGHT 120
+#define INFER_IMAGE_WIDTH 160
+#define NORMALIZED_DEPTH_VALUE_ (2048.0f)
+#define DEPTH_UNUSUAL_VALUE 6000 // 6m
 class  BodyPartClassifier
 {
 public:
@@ -124,11 +127,14 @@ public:
 
 	cv::Mat m_DepthMat;
 	cv::Mat m_MaskMat;
-
+	float m_ScaleHeight;
+	float m_ScaleWidth;
+	int m_CurrentPersonNumber;
 	cv::Mat m_PriorMat[_SUPPROT_PERSON_NUMBER_][_BODY_PART_NUMBER_];
 
 	bool LoadImage(const cv::Mat in_depthmat, const cv::Mat in_maskmat);
 	bool PredictRawParallel(void);
+	bool PredictOnePixel(int in_x, int in_y);
 };
 
 #endif//
