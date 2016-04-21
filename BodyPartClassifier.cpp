@@ -254,9 +254,11 @@ bool BodyPartClassifier::PredictRawParallel(void)
 	m_ScaleWidth = float (m_DepthMat.cols) / (float) INFER_IMAGE_WIDTH;
 	m_ScaleHeight = float(m_DepthMat.rows) / (float) INFER_IMAGE_HEIGHT;
 
-	for (int y = 0; y < INFER_IMAGE_HEIGHT; y++)
+	int x, y;
+#pragma omp parallel for private(x)
+	for ( y = 0; y < INFER_IMAGE_HEIGHT; y++)
 	{
-		for (int x = 0; x < INFER_IMAGE_WIDTH; x++)
+		for ( x = 0; x < INFER_IMAGE_WIDTH; x++)
 		{
 			PredictOnePixel(x, y);
 		}
@@ -339,7 +341,94 @@ bool BodyPartClassifier::PredictOnePixel(int in_x, int in_y)
 		{
 			uchar part_id = valuedst->v[i].id;
 			uchar part_cnt = valuedst->v[i].cnt;
-			m_PriorMat[pid][part_id].ptr<int>(in_y)[in_x] += part_cnt;
+			m_PriorMat[pid-1][part_id].ptr<int>(in_y)[in_x] += part_cnt;
 		}
 	}
+}
+
+void BodyPartClassifier::initCentroidpoint(void)
+{
+	// initialize memory
+	memset(m_CoordWorldSpace,0, INFER_IMAGE_HEIGHT*INFER_IMAGE_WIDTH*sizeof(Vector4));
+	memset(m_PartCentroid,0, _SUPPROT_PERSON_NUMBER_*_BODY_PART_NUMBER_*sizeof(Vector4));
+	memset(m_PartCount,0, _SUPPROT_PERSON_NUMBER_*_BODY_PART_NUMBER_*sizeof(int));
+
+	int x, y;
+	int orix,oriy,pid,partid;
+	ushort depthv;
+	Vector4 worldcord;
+	float probability;
+#pragma omp parallel for private(x,orix,oriy,depthv,pid,worldcord,partid,probability)
+	for (y = 0; y < INFER_IMAGE_HEIGHT; y++)
+	{
+		for (x = 0; x < INFER_IMAGE_WIDTH; x++)
+		{
+			orix = (int)(m_ScaleWidth * x);
+			oriy = (int)(m_ScaleHeight * y);
+			depthv = m_DepthMat.ptr<ushort>(oriy)[orix];
+			pid = m_MaskMat.ptr<uchar>(oriy)[orix];
+
+			if(pid == 0 || pid > _SUPPROT_PERSON_NUMBER_)
+				continue;
+
+			ImageToWorldSpace(Vector4I(x,y,depthv),worldcord);
+
+			m_CoordWorldSpace[y][x] = worldcord;
+
+			for (partid = 0; partid < _BODY_PART_NUMBER_; partid++)
+			{
+				probability = m_PriorMat[pid - 1][partid].ptr<float>(y)[x];
+				probability /= (m_forest.TreeNumber()*255.0f);
+				m_PriorMat[pid - 1][partid].ptr<float>(y)[x] = probability;
+
+				if (probability > 0.14f)
+				{
+					m_PartCentroid[pid - 1][partid].x += worldcord.x;
+					m_PartCentroid[pid - 1][partid].y += worldcord.y;
+					m_PartCentroid[pid - 1][partid].z += worldcord.z;
+
+					m_PartCount[pid - 1][partid] += 1;
+				}
+
+			}
+		}
+	}
+}
+
+
+void BodyPartClassifier::ImageToWorldSpace(const Vector4I & src, Vector4 & dst, int height/* = 120*/, int width/* = 160*/)
+{
+	//  static const float NUI_CAMERA_DEPTH_IMAGE_TO_SKELETON_MULTIPLIER_320x240 = 3.501f/1000;
+	assert(height >= 120);
+	assert(width >= 160);
+
+	dst.z = src.z * 0.001f;	//the metrics: m
+	dst.x = (src.x - width / 2.0f) * (320.0f / width) * NUI_CAMERA_DEPTH_IMAGE_TO_SKELETON_MULTIPLIER_320x240 * dst.z;
+	dst.y = -(src.y - height / 2.0f) * (240.0f / height) * NUI_CAMERA_DEPTH_IMAGE_TO_SKELETON_MULTIPLIER_320x240 * dst.z;
+	dst.w = 0;
+}
+
+
+void BodyPartClassifier::WorldToImageSpace(const Vector4 & src, Vector4I & dst, int height/* = 120*/, int width/* = 160*/)
+{
+	//  static const float NUI_CAMERA_SKELETON_TO_DEPTH_IMAGE_MULTIPLIER_320x240 = 285.63f;
+	assert(height >= 120);
+	assert(width >= 160);
+
+	if (src.z > FLT_EPSILON)
+	{
+		dst.x = (int)(width / 2 + src.x * (width / 320.0) * NUI_CAMERA_SKELETON_TO_DEPTH_IMAGE_MULTIPLIER_320x240 / src.z);
+		dst.y = (int)(height / 2 - src.y * (height / 240.0) * NUI_CAMERA_SKELETON_TO_DEPTH_IMAGE_MULTIPLIER_320x240 / src.z);
+		dst.z = (int)(src.z * 1000);
+		dst.w = 1;
+	}
+	else
+	{
+		dst.x = 0;
+		dst.y = 0;
+		dst.z = 0;
+		dst.w = 0;
+	}
+	//assert(dst.y >= 0 && dst.y < height);
+	//assert(dst.x >= 0 && dst.x < width);
 }

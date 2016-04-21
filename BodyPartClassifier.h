@@ -131,10 +131,16 @@ public:
 	float m_ScaleWidth;
 	int m_CurrentPersonNumber;
 	cv::Mat m_PriorMat[_SUPPROT_PERSON_NUMBER_][_BODY_PART_NUMBER_];
+	Vector4 m_CoordWorldSpace[INFER_IMAGE_HEIGHT][INFER_IMAGE_WIDTH];
+	Vector4 m_PartCentroid[_SUPPROT_PERSON_NUMBER_][_BODY_PART_NUMBER_];
+	int		m_PartCount[_SUPPROT_PERSON_NUMBER_][_BODY_PART_NUMBER_];
 
 	bool LoadImage(const cv::Mat in_depthmat, const cv::Mat in_maskmat);
 	bool PredictRawParallel(void);
 	bool PredictOnePixel(int in_x, int in_y);
+	void initCentroidpoint(void);
+	void ImageToWorldSpace(const Vector4I & src, Vector4 & dst, int height = INFER_IMAGE_HEIGHT, int width = INFER_IMAGE_WIDTH);
+	void WorldToImageSpace(const Vector4 & src, Vector4I & dst, int height = INFER_IMAGE_HEIGHT, int width = INFER_IMAGE_WIDTH);
 };
 
 #endif//
